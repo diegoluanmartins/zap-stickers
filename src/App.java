@@ -1,3 +1,6 @@
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -10,6 +13,9 @@ public class App {
         /*
          * Load IMDB data with HTTP connection
         */
+        String apiKey = getImdbApiKey();
+        System.out.println(apiKey);
+        // String rawUrl = "https://imdb-api.com/en/API/Top250Movies/" + apiKey;
         String rawUrl = "https://raw.githubusercontent.com/alura-cursos/imersao-java-2-api/main/TopMovies.json";
         HttpClient client = HttpClient.newHttpClient();
         URI url = URI.create(rawUrl);
@@ -36,6 +42,18 @@ public class App {
             String rating = movie.get("imDbRating") + String.join("", Collections.nCopies(maxRatingLength - movie.get("imDbRating").length(), " "));
             System.out.println(title + "\t|\t" + rating +  "\t|\t" + image);
         }
+    }
+
+    private static String getImdbApiKey(){
+        Properties props = new Properties();
+        try {
+            props.load(new FileInputStream("src/resources/app.properties"));
+        } catch (IOException e) {
+            // Handle exception
+        }
+
+        // Get a property value
+        return props.getProperty("imdb-key");
     }
 
 }
