@@ -3,6 +3,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.util.*;
 
 public class App {
     public static void main(String[] args) throws Exception {
@@ -15,19 +16,26 @@ public class App {
         HttpRequest request = HttpRequest.newBuilder(url).GET().build();
         HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
         String body = response.body();
-        System.out.println(body.length());
-
 
         /*
          * Extract json data: title, poster and classification
         */
-
+        JsonParser jsonParser = new JsonParser();
+        List<Map<String, String>> moviesList = jsonParser.parse(body);
 
         /*
          * Manipulate and show data
          *  
         */
-        System.out.println("It's raining man");
+        int maxTitleLength = Collections.max(moviesList, Comparator.comparing(obj -> obj.get("title").length())).get("title").length();
+        int maxUrlLength = Collections.max(moviesList, Comparator.comparing(obj -> obj.get("image").length())).get("image").length();
+        int maxRatingLength = Collections.max(moviesList, Comparator.comparing(obj -> obj.get("imDbRating").length())).get("imDbRating").length();
+        for (Map<String,String> movie : moviesList) {
+            String title = movie.get("title") + String.join("", Collections.nCopies(maxTitleLength - movie.get("title").length(), " "));
+            String image = movie.get("image") + String.join("", Collections.nCopies(maxUrlLength - movie.get("image").length(), " "));
+            String rating = movie.get("imDbRating") + String.join("", Collections.nCopies(maxRatingLength - movie.get("imDbRating").length(), " "));
+            System.out.println(title + "\t|\t" + rating +  "\t|\t" + image);
+        }
     }
 
 }
