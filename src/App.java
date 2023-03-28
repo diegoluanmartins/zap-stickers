@@ -15,7 +15,7 @@ public class App {
         HttpRequest request = HttpRequest.newBuilder(url).GET().build();
         HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
         String body = response.body();
-        System.out.println(body);
+        System.out.println(body.length());
 
 
         /*
