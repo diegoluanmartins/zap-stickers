@@ -54,7 +54,7 @@ public class App {
     private static String getImdbApiKey(){
         Properties props = new Properties();
         try {
-            props.load(new FileInputStream("src/resources/app.properties"));
+            props.load(new FileInputStream("resources/app.properties"));
         } catch (IOException e) {
             // Handle exception
         }
