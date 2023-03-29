@@ -50,7 +50,7 @@ public class App {
             String rating = movie.get("imDbRating") + String.join("", Collections.nCopies(maxRatingLength - movie.get("imDbRating").length(), " "));
             System.out.println(title + "\t|\t" + rating +  "\t|\t" + image);
             InputStream watermark;
-            if(Double.parseDouble(rating) > 9d){
+            if(Double.parseDouble(rating) >= 9d){
                 watermark = new FileInputStream(new File("resources/watermark-devil.png"));
             } else{
                 watermark = new FileInputStream(new File("resources/watermark-angel.png"));
