@@ -1,7 +1,11 @@
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Image;
+import java.awt.Shape;
+import java.awt.font.FontRenderContext;
+import java.awt.font.TextLayout;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
 import java.io.File;
@@ -39,10 +43,10 @@ public class StickerFactory {
     
     }
     public void create(InputStream sourceImage) throws IOException{
-        this.create(sourceImage, "");
+        this.create(sourceImage, "", null);
     } 
 
-    public void create(InputStream sourceImage, String text) throws IOException{
+    public void create(InputStream sourceImage, String text, InputStream watermark) throws IOException{
         /*
          * Clean source text
          */
@@ -67,32 +71,55 @@ public class StickerFactory {
         Graphics2D graphics = (Graphics2D) resized.getGraphics();
         graphics.drawImage(original, 0, 0, null);
 
+        
+        /*
+        * Configure water mark
+        */
+        if (watermark != null){
+            BufferedImage waterMarkImage = ImageIO.read(watermark);
+            float scale = Math.min((orgWidth/waterMarkImage.getWidth())*0.1f, (orgHeight/waterMarkImage.getHeight())*0.1f);
+            waterMarkImage = resizeImage(waterMarkImage, Math.round(waterMarkImage.getWidth()*scale), Math.round(waterMarkImage.getHeight()*scale));
+
+            /*
+            * Write water mark
+            */
+            graphics.drawImage(waterMarkImage, null, Math.round(orgWidth - waterMarkImage.getWidth()*1.1f), Math.round(rsdHeigth - waterMarkImage.getHeight()*1.1f));
+        }
+
+        
         /*
          * Configure text font
          */
         if(text.length() > 0){
-            Font font = new Font(Font.SERIF, Font.BOLD, getFontSize(graphics, text, Font.SERIF, Font.BOLD, orgHeight, orgWidth));
+            Font font = new Font("Imperial", Font.BOLD, getFontSize(graphics, text, Font.SERIF, Font.BOLD, orgHeight, orgWidth));
             graphics.setFont(font);
             graphics.setColor(Color.RED); 
         
         /*
         * Write text
         */
-            graphics.drawString(text, (orgWidth - graphics.getFontMetrics().stringWidth(text))/2 , rsdHeigth - (rsdHeigth-orgHeight)/2f + font.getSize()/3);
+            int textPosX = (orgWidth - graphics.getFontMetrics().stringWidth(text))/2;    
+            int textPosY = Math.round(rsdHeigth - (rsdHeigth-orgHeight)/2f + font.getSize()/2.75f);
+            graphics.drawString(text, textPosX, textPosY);
+        
+        /*
+         * Outline
+         */
+            FontRenderContext fontRenderContext = graphics.getFontRenderContext();
+            TextLayout textLayout = new TextLayout(text, font, fontRenderContext);
 
+            Shape outline = textLayout.getOutline(null);
+            AffineTransform transform = graphics.getTransform();
+            transform.translate(textPosX, textPosY);
+            graphics.setTransform(transform);
+            
+            BasicStroke stroke = new BasicStroke(font.getSize() * 0.025f);
+            graphics.setStroke(stroke);
+            graphics.setColor(Color.BLACK);
+            graphics.draw(outline);
+            graphics.setClip(outline);
+        
         }
-
-        /*
-         * Configure water mark
-         */
-        BufferedImage waterMark = ImageIO.read(new FileInputStream(INPUT + "watermark.png"));
-        float scale = Math.min((orgWidth/waterMark.getWidth())*0.1f, (orgHeight/waterMark.getHeight())*0.1f);
-        waterMark = resizeImage(waterMark, Math.round(waterMark.getWidth()*scale), Math.round(waterMark.getHeight()*scale));
-
-        /*
-         * Write water mark
-         */
-         graphics.drawImage(waterMark, null, Math.round(orgWidth - waterMark.getWidth()*1.1f), Math.round(rsdHeigth - waterMark.getHeight()*1.1f));
 
         /*
          * Save image
@@ -131,10 +158,10 @@ public class StickerFactory {
 
 
     private int getFontSize(Graphics2D graphics, String text, String fontName, int fontStyle, int height, int width){
-        Font baseFont = new Font(fontName, fontStyle, Math.round(Math.min(height * 1.2f, (width*1.4f)/(text.length()-1))));
+        Font baseFont = new Font(fontName, fontStyle, Math.round((width*1.4f)/(text.length()-1)));
         graphics.setFont(baseFont);        
         int fontSize = (int) Math.floor(((Double.valueOf(width))/graphics.getFontMetrics().stringWidth(text))*baseFont.getSize());
-        return fontSize;
+        return Math.min(Math.round(height * 0.25f), fontSize);
     }
 
     /*
@@ -145,6 +172,7 @@ public class StickerFactory {
         Graphics2D graphics2D = resizedImage.createGraphics();
         graphics2D.drawImage(originalImage, 0, 0, targetWidth, targetHeight, null);
         graphics2D.dispose();
+        
         return resizedImage;
     }
 
@@ -164,7 +192,7 @@ public class StickerFactory {
              ));
         for (String text : texts) {
             sourceImage = new FileInputStream(INPUT + "shawshank.jpg");
-            stickerFactory.create(sourceImage, text);
+            stickerFactory.create(sourceImage, text, null);
         }
     }
 }

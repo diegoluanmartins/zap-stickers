@@ -1,5 +1,7 @@
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.net.http.HttpClient;
@@ -47,7 +49,13 @@ public class App {
             String image = movie.get("image") + String.join("", Collections.nCopies(maxUrlLength - movie.get("image").length(), " "));
             String rating = movie.get("imDbRating") + String.join("", Collections.nCopies(maxRatingLength - movie.get("imDbRating").length(), " "));
             System.out.println(title + "\t|\t" + rating +  "\t|\t" + image);
-            sf.create(new URL(image).openStream(), title); 
+            InputStream watermark;
+            if(Double.parseDouble(rating) > 9d){
+                watermark = new FileInputStream(new File("resources/watermark-devil.png"));
+            } else{
+                watermark = new FileInputStream(new File("resources/watermark-angel.png"));
+            }
+            sf.create(new URL(image).openStream(), title, watermark); 
         }
     }
 
