@@ -1,19 +1,39 @@
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.font.FontRenderContext;
-import java.awt.geom.AffineTransform;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
 
 public class StickerFactory {
 
+    private static final String INPUT = "resources/";
+    private static final String OUTPUT = "resources/output/";
+
+    public enum ImageExtension  {
+        PNG("png"),
+        JPG("jpg"),
+        BMP("bmp");
+
+        private String description;
+        ImageExtension(String description){
+            this.description = description;
+        }
+        public String getDescription(){
+            return description;
+        }
+
+    }
+    
     public StickerFactory() {
     
     }
@@ -50,54 +70,58 @@ public class StickerFactory {
          * Configure text font
          */
         if(text.length() > 0){
-            // AffineTransform affinetransform = new AffineTransform();     
-            // FontRenderContext frc = new FontRenderContext(affinetransform,true,true);     
-            // Font font = new Font(Font.SERIF, Font.PLAIN, 12);
-            // int textwidth = (int)(font.getStringBounds(text, frc).getWidth());
-            // int textheight = (int)(font.getStringBounds(text, frc).getHeight());
-            Font baseFont = new Font(Font.SERIF, Font.BOLD, Math.round(Math.min(orgHeight * 1.2f, (orgWidth*1.4f)/(text.length()-1))));
-            graphics.setFont(baseFont);
-            graphics.setColor(Color.RED);
-            
-            int fontSize = (int) Math.floor(((Double.valueOf(orgWidth))/graphics.getFontMetrics().stringWidth(text))*baseFont.getSize());
-            Font rsdFont = new Font(Font.SERIF, Font.BOLD, fontSize);
-            graphics.setFont(rsdFont);
-            
-            System.out.println("Base Font size: " + baseFont.getSize());
-            System.out.println("Rsd Font size: " + rsdFont.getSize());
-            System.out.println("Font size: " + fontSize);
-            System.out.println("Text width:" + graphics.getFontMetrics().stringWidth(text));
-            System.out.println("Image width:" + orgWidth);
+            Font font = new Font(Font.SERIF, Font.BOLD, getFontSize(graphics, text, Font.SERIF, Font.BOLD, orgHeight, orgWidth));
+            graphics.setFont(font);
+            graphics.setColor(Color.RED);           
 
         /*
         * Write text
         */
-            graphics.drawString(text, (orgWidth - graphics.getFontMetrics().stringWidth(text))/2 , rsdHeigth - (rsdHeigth-orgHeight)/2f + rsdFont.getSize()/3);
+            graphics.drawString(text, (orgWidth - graphics.getFontMetrics().stringWidth(text))/2 , rsdHeigth - (rsdHeigth-orgHeight)/2f + font.getSize()/3);
 
         }
 
         /*
          * Save image
          */
-        ImageIO.write(resized, "png", new File("resources/output/" + System.currentTimeMillis() + ".png"));
+        ImageIO.write(resized, ImageExtension.PNG.description, new File(this.getFileName(text, ImageExtension.PNG.description)));
     }
+
+    /**
+     * Create file name
+     */
+    private String getFileName(String text, String extension){
+        return OUTPUT + text.toLowerCase()
+        .replaceAll(" ", "-")
+        .replaceAll("[^A-Za-z0-9-]", "")
+         + "." + extension;
+    }
+
+
+    private int getFontSize(Graphics2D graphics, String text, String fontName, int fontStyle, int height, int width){
+        Font baseFont = new Font(fontName, fontStyle, Math.round(Math.min(height * 1.2f, (width*1.4f)/(text.length()-1))));
+        graphics.setFont(baseFont);        
+        int fontSize = (int) Math.floor(((Double.valueOf(width))/graphics.getFontMetrics().stringWidth(text))*baseFont.getSize());
+        return fontSize;
+    }
+
 
     /**
      * Main used only to test the class functions and structure
      */
     public static void main(String[] args) throws IOException {
         StickerFactory stickerFactory = new StickerFactory();
-        InputStream sourceImage = new FileInputStream("resources/shawshank.jpg");
-        stickerFactory.create(sourceImage, "8888888888888888888888889");
-        sourceImage = new FileInputStream("resources/shawshank.jpg");
-        stickerFactory.create(sourceImage, "888888888888888889");
-        sourceImage = new FileInputStream("resources/shawshank.jpg");
-        stickerFactory.create(sourceImage, "8888888888888888888888888888889");
-        sourceImage = new FileInputStream("resources/shawshank.jpg");
-        stickerFactory.create(sourceImage, "88889");
-        sourceImage = new FileInputStream("resources/shawshank.jpg");
-        stickerFactory.create(sourceImage, "888888888889");
-        sourceImage = new FileInputStream("resources/shawshank.jpg");
-        stickerFactory.create(sourceImage, "8888888888888888888889");
+        InputStream sourceImage;
+        List<String> texts = new ArrayList<>(Arrays.asList(
+            "888888",
+             "888889",
+             "889",
+             "888888888888 8 8 88 9",
+             "8.8.8.8.8.8....89"
+             ));
+        for (String text : texts) {
+            sourceImage = new FileInputStream(INPUT + "shawshank.jpg");
+            stickerFactory.create(sourceImage, text);
+        }
     }
 }
