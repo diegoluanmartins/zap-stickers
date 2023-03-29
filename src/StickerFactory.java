@@ -59,7 +59,7 @@ public class StickerFactory {
             graphics.setFont(baseFont);
             graphics.setColor(Color.RED);
             
-            int fontSize = (int) Math.floor(((new Double(orgWidth))/graphics.getFontMetrics().stringWidth(text))*baseFont.getSize());
+            int fontSize = (int) Math.floor(((Double.valueOf(orgWidth))/graphics.getFontMetrics().stringWidth(text))*baseFont.getSize());
             Font rsdFont = new Font(Font.SERIF, Font.BOLD, fontSize);
             graphics.setFont(rsdFont);
             
