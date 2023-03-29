@@ -1,11 +1,16 @@
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 
 public class App {
@@ -36,11 +41,13 @@ public class App {
         int maxTitleLength = Collections.max(moviesList, Comparator.comparing(obj -> obj.get("title").length())).get("title").length();
         int maxUrlLength = Collections.max(moviesList, Comparator.comparing(obj -> obj.get("image").length())).get("image").length();
         int maxRatingLength = Collections.max(moviesList, Comparator.comparing(obj -> obj.get("imDbRating").length())).get("imDbRating").length();
+        StickerFactory sf = new StickerFactory();
         for (Map<String,String> movie : moviesList) {
             String title = movie.get("title") + String.join("", Collections.nCopies(maxTitleLength - movie.get("title").length(), " "));
             String image = movie.get("image") + String.join("", Collections.nCopies(maxUrlLength - movie.get("image").length(), " "));
             String rating = movie.get("imDbRating") + String.join("", Collections.nCopies(maxRatingLength - movie.get("imDbRating").length(), " "));
             System.out.println(title + "\t|\t" + rating +  "\t|\t" + image);
+            sf.create(new URL(image).openStream(), title); 
         }
     }
 
