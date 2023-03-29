@@ -3,6 +3,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -72,8 +73,8 @@ public class StickerFactory {
         if(text.length() > 0){
             Font font = new Font(Font.SERIF, Font.BOLD, getFontSize(graphics, text, Font.SERIF, Font.BOLD, orgHeight, orgWidth));
             graphics.setFont(font);
-            graphics.setColor(Color.RED);           
-
+            graphics.setColor(Color.RED); 
+        
         /*
         * Write text
         */
@@ -82,16 +83,47 @@ public class StickerFactory {
         }
 
         /*
+         * Configure water mark
+         */
+        BufferedImage waterMark = ImageIO.read(new FileInputStream(INPUT + "watermark.png"));
+        float scale = Math.min((orgWidth/waterMark.getWidth())*0.1f, (orgHeight/waterMark.getHeight())*0.1f);
+        waterMark = resizeImage(waterMark, Math.round(waterMark.getWidth()*scale), Math.round(waterMark.getHeight()*scale));
+
+        /*
+         * Write water mark
+         */
+         graphics.drawImage(waterMark, null, Math.round(orgWidth - waterMark.getWidth()*1.1f), Math.round(rsdHeigth - waterMark.getHeight()*1.1f));
+
+        /*
          * Save image
          */
-        ImageIO.write(resized, ImageExtension.PNG.description, new File(this.getFileName(text, ImageExtension.PNG.description)));
+        this.saveImage(resized, ImageExtension.PNG.description, OUTPUT, this.getFileName(text, ImageExtension.PNG.description));
+    }
+
+    public boolean saveImage(RenderedImage image, String extension, String path, String name) throws IOException{
+        File folder = new File(path);
+        if(!folder.exists()) folder.mkdir();
+        try {
+            ImageIO.write(image, ImageExtension.PNG.description, new File(name));
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+        
     }
 
     /**
      * Create file name
      */
     private String getFileName(String text, String extension){
-        return OUTPUT + text.toLowerCase()
+        return getFileName(OUTPUT, text, extension);
+    }
+
+    /**
+     * Create file name
+     */
+    private String getFileName(String output, String text, String extension){
+        return output + text.toLowerCase()
         .replaceAll(" ", "-")
         .replaceAll("[^A-Za-z0-9-]", "")
          + "." + extension;
@@ -103,6 +135,17 @@ public class StickerFactory {
         graphics.setFont(baseFont);        
         int fontSize = (int) Math.floor(((Double.valueOf(width))/graphics.getFontMetrics().stringWidth(text))*baseFont.getSize());
         return fontSize;
+    }
+
+    /*
+     * Resize image
+     */
+    BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) throws IOException {
+        BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
+        Graphics2D graphics2D = resizedImage.createGraphics();
+        graphics2D.drawImage(originalImage, 0, 0, targetWidth, targetHeight, null);
+        graphics2D.dispose();
+        return resizedImage;
     }
 
 
