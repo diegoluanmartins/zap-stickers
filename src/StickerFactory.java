@@ -77,7 +77,7 @@ public class StickerFactory {
         */
         if (watermark != null){
             BufferedImage waterMarkImage = ImageIO.read(watermark);
-            float scale = Math.min((orgWidth/waterMarkImage.getWidth())*0.1f, (orgHeight/waterMarkImage.getHeight())*0.1f);
+            float scale = Math.min((orgWidth/waterMarkImage.getWidth())*0.2f, (orgHeight/waterMarkImage.getHeight())*0.2f);
             waterMarkImage = resizeImage(waterMarkImage, Math.round(waterMarkImage.getWidth()*scale), Math.round(waterMarkImage.getHeight()*scale));
 
             /*
