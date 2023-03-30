@@ -1,11 +1,25 @@
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class ImageExtractorImdb implements ImageExtractor {
 
     @Override
     public List<Image> extractImages(String json) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'extractImages'");
+        /*
+         * Extract json data
+        */
+        JsonParser jsonParser = new JsonParser();
+        List<Map<String, String>> attributesList = jsonParser.parse(json);
+        List<Image> imagesList = new ArrayList<>();
+        
+        for (Map<String, String> attributes : attributesList) {
+            String title = attributes.get("title");
+            String imgUrl = attributes.get("image");
+            imagesList.add(new Image(title, imgUrl));
+        }
+        
+        return imagesList;
     }
     
 }

@@ -23,35 +23,30 @@ public class App {
         String apiKey = getImdbApiKey();
         System.out.println(apiKey);
         // String rawUrl = "https://imdb-api.com/en/API/Top250Movies/" + apiKey;
+        // String rawUrl = "https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY";
         String rawUrl = "https://raw.githubusercontent.com/alura-cursos/imersao-java-2-api/main/TopMovies.json";
         HttpClientController httpClient = new HttpClientController();
         String bodyString = httpClient.executeGET(rawUrl);
+        System.out.println(bodyString);
 
         /*
          * Extract json data
         */
-        JsonParser jsonParser = new JsonParser();
-        List<Map<String, String>> imagesList = jsonParser.parse(bodyString);
+        ImageExtractor imageExtractor = new ImageExtractorImdb();
+        List<Image> imagesList = imageExtractor.extractImages(bodyString);
 
         /*
          * Manipulate and show data
          *  
         */
-        int maxTitleLength = Collections.max(imagesList, Comparator.comparing(obj -> obj.get("title").length())).get("title").length();
-        int maxUrlLength = Collections.max(imagesList, Comparator.comparing(obj -> obj.get("image").length())).get("image").length();
-        int maxRatingLength = Collections.max(imagesList, Comparator.comparing(obj -> obj.get("imDbRating").length())).get("imDbRating").length();
+        int maxTitleLength = Collections.max(imagesList, Comparator.comparing(obj -> obj.getTitle().length())).getTitle().length();
+        int maxUrlLength = Collections.max(imagesList, Comparator.comparing(obj -> obj.getUrl().length())).getUrl().length();
         StickerFactory sf = new StickerFactory();
-        for (Map<String,String> image : imagesList) {
-            String imageTitle = image.get("title") + String.join("", Collections.nCopies(maxTitleLength - image.get("title").length(), " "));
-            String imageUrl = image.get("image") + String.join("", Collections.nCopies(maxUrlLength - image.get("image").length(), " "));
-            String imageRating = image.get("imDbRating") + String.join("", Collections.nCopies(maxRatingLength - image.get("imDbRating").length(), " "));
-            System.out.println(imageTitle + "\t|\t" + imageRating +  "\t|\t" + imageUrl);
-            InputStream watermark;
-            if(Double.parseDouble(imageRating) >= 9d){
-                watermark = new FileInputStream(new File("resources/watermark-devil.png"));
-            } else{
-                watermark = new FileInputStream(new File("resources/watermark-angel.png"));
-            }
+        for (Image image : imagesList) {
+            String imageTitle = image.getTitle() + String.join("", Collections.nCopies(maxTitleLength - image.getTitle().length(), " "));
+            String imageUrl = image.getUrl() + String.join("", Collections.nCopies(maxUrlLength - image.getUrl().length(), " "));
+            System.out.println(imageTitle + "\t|\t" + imageUrl);
+            InputStream watermark = new FileInputStream(new File("resources/watermark-devil.png"));
             sf.create(new URL(imageUrl).openStream(), imageTitle, watermark); 
         }
     }
