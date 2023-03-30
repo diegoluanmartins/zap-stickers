@@ -24,17 +24,14 @@ public class App {
         System.out.println(apiKey);
         // String rawUrl = "https://imdb-api.com/en/API/Top250Movies/" + apiKey;
         String rawUrl = "https://raw.githubusercontent.com/alura-cursos/imersao-java-2-api/main/TopMovies.json";
-        HttpClient client = HttpClient.newHttpClient();
-        URI url = URI.create(rawUrl);
-        HttpRequest request = HttpRequest.newBuilder(url).GET().build();
-        HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
-        String body = response.body();
+        HttpClientController httpClient = new HttpClientController();
+        String bodyString = httpClient.executeGET(rawUrl);
 
         /*
          * Extract json data
         */
         JsonParser jsonParser = new JsonParser();
-        List<Map<String, String>> imagesList = jsonParser.parse(body);
+        List<Map<String, String>> imagesList = jsonParser.parse(bodyString);
 
         /*
          * Manipulate and show data
