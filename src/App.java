@@ -31,31 +31,31 @@ public class App {
         String body = response.body();
 
         /*
-         * Extract json data: title, poster and classification
+         * Extract json data
         */
         JsonParser jsonParser = new JsonParser();
-        List<Map<String, String>> moviesList = jsonParser.parse(body);
+        List<Map<String, String>> imagesList = jsonParser.parse(body);
 
         /*
          * Manipulate and show data
          *  
         */
-        int maxTitleLength = Collections.max(moviesList, Comparator.comparing(obj -> obj.get("title").length())).get("title").length();
-        int maxUrlLength = Collections.max(moviesList, Comparator.comparing(obj -> obj.get("image").length())).get("image").length();
-        int maxRatingLength = Collections.max(moviesList, Comparator.comparing(obj -> obj.get("imDbRating").length())).get("imDbRating").length();
+        int maxTitleLength = Collections.max(imagesList, Comparator.comparing(obj -> obj.get("title").length())).get("title").length();
+        int maxUrlLength = Collections.max(imagesList, Comparator.comparing(obj -> obj.get("image").length())).get("image").length();
+        int maxRatingLength = Collections.max(imagesList, Comparator.comparing(obj -> obj.get("imDbRating").length())).get("imDbRating").length();
         StickerFactory sf = new StickerFactory();
-        for (Map<String,String> movie : moviesList) {
-            String title = movie.get("title") + String.join("", Collections.nCopies(maxTitleLength - movie.get("title").length(), " "));
-            String image = movie.get("image") + String.join("", Collections.nCopies(maxUrlLength - movie.get("image").length(), " "));
-            String rating = movie.get("imDbRating") + String.join("", Collections.nCopies(maxRatingLength - movie.get("imDbRating").length(), " "));
-            System.out.println(title + "\t|\t" + rating +  "\t|\t" + image);
+        for (Map<String,String> image : imagesList) {
+            String imageTitle = image.get("title") + String.join("", Collections.nCopies(maxTitleLength - image.get("title").length(), " "));
+            String imageUrl = image.get("image") + String.join("", Collections.nCopies(maxUrlLength - image.get("image").length(), " "));
+            String imageRating = image.get("imDbRating") + String.join("", Collections.nCopies(maxRatingLength - image.get("imDbRating").length(), " "));
+            System.out.println(imageTitle + "\t|\t" + imageRating +  "\t|\t" + imageUrl);
             InputStream watermark;
-            if(Double.parseDouble(rating) >= 9d){
+            if(Double.parseDouble(imageRating) >= 9d){
                 watermark = new FileInputStream(new File("resources/watermark-devil.png"));
             } else{
                 watermark = new FileInputStream(new File("resources/watermark-angel.png"));
             }
-            sf.create(new URL(image).openStream(), title, watermark); 
+            sf.create(new URL(imageUrl).openStream(), imageTitle, watermark); 
         }
     }
 

@@ -16,3 +16,20 @@ Meanwhile, the compiled output files will be generated in the `bin` folder by de
 ## Dependency Management
 
 The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
+
+
+## Structure
+
+```mermaid
+classDiagram
+    App .. HttpClient
+    HttpClient : getHttpClient(String url) -> String Body
+    App --> ImageExtractorImdb
+    ImageExtractorImdb : getImageList(String json) -> List<Image>
+    App --> ImageExtractorNasa
+    ImageExtractorNasa : getImageList(String json) -> List<Image>
+    ImageExtractorImdb --> JsonParser
+    ImageExtractorNasa --> JsonParser
+    App --> StickerFactory
+    StickerFactory : create(InputStream)
+```
