@@ -46,6 +46,13 @@ public class StickerFactory {
         this.create(sourceImage, "", null);
     } 
 
+    /**
+     * Create a sticker
+     * @param sourceImage
+     * @param text
+     * @param watermark
+     * @throws IOException
+     */
     public void create(InputStream sourceImage, String text, InputStream watermark) throws IOException{
         /*
          * Clean source text
@@ -77,8 +84,8 @@ public class StickerFactory {
         */
         if (watermark != null){
             BufferedImage waterMarkImage = ImageIO.read(watermark);
-            float scale = Math.min((orgWidth/waterMarkImage.getWidth())*0.1f, (orgHeight/waterMarkImage.getHeight())*0.1f);
-            waterMarkImage = resizeImage(waterMarkImage, Math.round(waterMarkImage.getWidth()*scale), Math.round(waterMarkImage.getHeight()*scale));
+            float scale = Math.min((orgWidth*1f/waterMarkImage.getWidth()*1f)*0.1f, (orgHeight*1f/waterMarkImage.getHeight()*1f)*0.1f);
+            waterMarkImage = resizeImage(waterMarkImage, scale);
 
             /*
             * Write water mark
@@ -127,6 +134,15 @@ public class StickerFactory {
         this.saveImage(resized, ImageExtension.PNG.description, OUTPUT, this.getFileName(text, ImageExtension.PNG.description));
     }
 
+    /**
+     * Save image
+     * @param image
+     * @param extension
+     * @param path
+     * @param name
+     * @return
+     * @throws IOException
+     */
     public boolean saveImage(RenderedImage image, String extension, String path, String name) throws IOException{
         File folder = new File(path);
         if(!folder.exists()) folder.mkdir();
@@ -141,6 +157,9 @@ public class StickerFactory {
 
     /**
      * Create file name
+     * @param text
+     * @param extension
+     * @return
      */
     private String getFileName(String text, String extension){
         return getFileName(OUTPUT, text, extension);
@@ -148,6 +167,10 @@ public class StickerFactory {
 
     /**
      * Create file name
+     * @param output
+     * @param text
+     * @param extension
+     * @return
      */
     private String getFileName(String output, String text, String extension){
         return output + text.toLowerCase()
@@ -156,7 +179,17 @@ public class StickerFactory {
          + "." + extension;
     }
 
-
+    /**
+     * Get biggest font size for the specified region
+     * @param graphics
+     * @param text
+     * @param fontName
+     * @param fontStyle
+     * @param height
+     * @param width
+     * @return
+     * 
+     */
     private int getFontSize(Graphics2D graphics, String text, String fontName, int fontStyle, int height, int width){
         Font baseFont = new Font(fontName, fontStyle, Math.round((width*1.4f)/(text.length()-1)));
         graphics.setFont(baseFont);        
@@ -164,10 +197,16 @@ public class StickerFactory {
         return Math.min(Math.round(height * 0.25f), fontSize);
     }
 
-    /*
-     * Resize image
+    /**
+     * Resize images base on new height
+     * @param originalImage
+     * @param scale
+     * @return
+     * @throws IOException
      */
-    BufferedImage resizeImage(BufferedImage originalImage, int targetWidth, int targetHeight) throws IOException {
+    BufferedImage resizeImage(BufferedImage originalImage, float scale) throws IOException {
+        int targetWidth = Math.round(originalImage.getWidth() * scale);
+        int targetHeight = Math.round(originalImage.getHeight() * scale);
         BufferedImage resizedImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_INT_RGB);
         Graphics2D graphics2D = resizedImage.createGraphics();
         graphics2D.drawImage(originalImage, 0, 0, targetWidth, targetHeight, null);
@@ -176,9 +215,10 @@ public class StickerFactory {
         return resizedImage;
     }
 
-
     /**
      * Main used only to test the class functions and structure
+     * @param args
+     * @throws IOException
      */
     public static void main(String[] args) throws IOException {
         StickerFactory stickerFactory = new StickerFactory();

@@ -9,31 +9,21 @@ public class ImageExtractorNasa implements ImageExtractor {
         /*
          * Extract json data
         */
-        JsonParser jsonParser = new JsonParser();
-        List<Map<String, String>> attributesList = jsonParser.parse(json);
-        List<Image> imagesList = new ArrayList<>();
-        
-        for (Map<String, String> attributes : attributesList) {
-            String title = attributes.get("title");
-            String imgUrl = attributes.get("url");
-            imagesList.add(new Image(title, imgUrl));
-        }
-        return imagesList;
+        List<Map<String, String>> attributesList = new JsonParser().parse(json);
+
+        return attributesList.stream().map(attribute -> 
+            new Image(attribute.get("title"),attribute.get("url"))
+        ).toList();
+
     }
     
     public List<Image> extractImages(String json, boolean hdImage){
         /*
          * Extract json data
         */
-        JsonParser jsonParser = new JsonParser();
-        List<Map<String, String>> attributesList = jsonParser.parse(json);
-        List<Image> imagesList = new ArrayList<>();
-        
-        for (Map<String, String> attributes : attributesList) {
-            String title = attributes.get("title");
-            String imgUrl = attributes.get("urlhd");
-            imagesList.add(new Image(title, imgUrl));
-        }
-        return imagesList;
+        List<Map<String, String>> attributesList = new JsonParser().parse(json);
+        return attributesList.stream().map(attribute -> 
+            new Image(attribute.get("title"),attribute.get("urlhd"))
+        ).toList();
     }
 }

@@ -32,4 +32,6 @@ classDiagram
     ImageExtractorNasa --> JsonParser
     App --> StickerFactory
     StickerFactory : create(InputStream)
+    class `Image`
+    
 ```
