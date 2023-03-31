@@ -214,25 +214,4 @@ public class StickerFactory {
         
         return resizedImage;
     }
-
-    /**
-     * Main used only to test the class functions and structure
-     * @param args
-     * @throws IOException
-     */
-    public static void main(String[] args) throws IOException {
-        StickerFactory stickerFactory = new StickerFactory();
-        InputStream sourceImage;
-        List<String> texts = new ArrayList<>(Arrays.asList(
-            "888888",
-             "888889",
-             "889",
-             "888888888888 8 8 88 9",
-             "8.8.8.8.8.8....89"
-             ));
-        for (String text : texts) {
-            sourceImage = new FileInputStream(INPUT + "shawshank.jpg");
-            stickerFactory.create(sourceImage, text, null);
-        }
-    }
 }
