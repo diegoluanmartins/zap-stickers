@@ -4,7 +4,8 @@ import java.util.Properties;
 
 public enum API {
     IMDB_TOP_MOVIES("https://raw.githubusercontent.com/alura-cursos/imersao-java-2-api/main/TopMovies.json","imdb-key-mock", new ImageExtractorImdb()),
-    NASA_APOD("https://api.nasa.gov/planetary/apod?api_key=","nasa-key", new ImageExtractorNasa()),;
+    NASA_APOD("https://api.nasa.gov/planetary/apod?api_key=","nasa-key", new ImageExtractorNasa()),
+    PLANG("http://localhost:8080/p-lang","", new ImageExtractorPLang());
 
     private String url;
     private ImageExtractor imageExtractor;

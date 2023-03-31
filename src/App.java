@@ -12,7 +12,7 @@ public class App {
         /*
          * Load API data with HTTP connection
         */
-        API api = API.IMDB_TOP_MOVIES;
+        API api = API.PLANG;
         ImageExtractor imageExtractor = api.getImageExtractor();
         HttpClientController httpClient = new HttpClientController();
         String bodyString = httpClient.executeGET(api.getUrl());
